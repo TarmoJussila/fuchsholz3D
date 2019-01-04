@@ -39,6 +39,7 @@ public class Game : MonoBehaviour
     // Map.
     private readonly int mapWidth = 32;
     private readonly int mapHeight = 32;
+
     private readonly List<string> map = new List<string>()
     {
         "################################",
@@ -102,7 +103,7 @@ public class Game : MonoBehaviour
 
     private void GeneratePlayer()
     {
-        playerTransform = Instantiate(PlayerPrefab, new Vector2(playerStartX - (1 / 2f), playerStartY - (1 / 2f)), Quaternion.identity, transform);
+        playerTransform = Instantiate(PlayerPrefab, new Vector2(playerStartX - 0.5f, playerStartY - 0.5f), Quaternion.identity, transform);
     }
 
     private void GenerateMapColliders()
@@ -173,10 +174,20 @@ public class Game : MonoBehaviour
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         {
             playerTransform.position += playerTransform.up * playerSpeed * Time.deltaTime;
+
+            if (GetRaycastDistance(true) < 0.5f)
+            {
+                playerTransform.position -= playerTransform.up * playerSpeed * Time.deltaTime;
+            }
         }
         else if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
         {
             playerTransform.position -= playerTransform.up * playerSpeed * Time.deltaTime;
+
+            if (GetRaycastDistance(false) < 0.5f)
+            {
+                playerTransform.position += playerTransform.up * playerSpeed * Time.deltaTime;
+            }
         }
     }
 
@@ -184,7 +195,7 @@ public class Game : MonoBehaviour
     {
         for (int i = 0; i < screenWidth; i++)
         {
-            var direction = playerTransform.TransformDirection(new Vector2((i - (screenWidth / 2)) * raycastSpread, raycastLength));
+            var direction = playerTransform.TransformDirection(new Vector2((i - (screenWidth / 2f)) * raycastSpread, raycastLength));
 
             var hit = Physics2D.Raycast(playerTransform.position, direction, raycastMaxDistance);
 
@@ -237,15 +248,31 @@ public class Game : MonoBehaviour
         }
     }
 
+    private float GetRaycastDistance(bool isForward = true)
+    {
+        float distance = raycastMaxDistance;
+
+        var direction = isForward ? playerTransform.up : -playerTransform.up;
+
+        var hit = Physics2D.Raycast(playerTransform.position, direction, raycastMaxDistance);
+
+        if (hit.collider != null)
+        {
+            distance = hit.distance;
+        }
+
+        return distance;
+    }
+
     private void OnDrawGizmos()
     {
         if (Application.isPlaying && playerTransform != null)
         {
-            Gizmos.DrawSphere(playerTransform.position, 1f);
+            Gizmos.DrawSphere(playerTransform.position, 0.5f);
 
             for (int i = 0; i < screenWidth; i++)
             {
-                var direction = playerTransform.TransformDirection(new Vector2((i - (screenWidth / 2)) * raycastSpread, raycastLength));
+                var direction = playerTransform.TransformDirection(new Vector2((i - (screenWidth / 2f)) * raycastSpread, raycastLength));
 
                 Gizmos.DrawRay(playerTransform.position, direction);
             }
