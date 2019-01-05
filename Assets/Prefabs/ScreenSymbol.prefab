@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7682699203229504982}
   - component: {fileID: 7682699203229504980}
   - component: {fileID: 7682699203229504981}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: ScreenSymbol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,7 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7682699203229504983}
-  m_CullTransparentMesh: 1
+  m_CullTransparentMesh: 0
 --- !u!114 &7682699203229504981
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -67,7 +67,7 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 12800000, guid: e14cb9277021a8d4e8d8f85bdcc634f6, type: 3}
-    m_FontSize: 16
+    m_FontSize: 10
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 0
@@ -77,5 +77,5 @@ MonoBehaviour:
     m_RichText: 0
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
-    m_LineSpacing: 1
-  m_Text: '#'
+    m_LineSpacing: 0
+  m_Text: 

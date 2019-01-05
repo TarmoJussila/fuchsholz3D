@@ -25,7 +25,12 @@ public class Game : MonoBehaviour
     // Screen.
     private readonly int screenWidth = 64;
     private readonly int screenHeight = 32;
-    private readonly int screenOffset = 16;
+    private readonly int screenOffset = 8;
+    private readonly string screenBlock = "■";
+    private readonly string screenBlockTop = "▦";
+    private readonly string screenBlockBottom = "▩";
+    private readonly string screenEmpty = string.Empty;
+    private readonly float distanceMultiplier = 1.3f;
 
     private Dictionary<Position, Text> screenSymbols = new Dictionary<Position, Text>();
 
@@ -34,7 +39,7 @@ public class Game : MonoBehaviour
     private readonly float raycastSpread = 0.2f;
     private readonly float raycastLength = 10f;
 
-    private Dictionary<int, float> raycastDistances = new Dictionary<int, float>();
+    private Dictionary<int, RaycastHit2D> raycastHits = new Dictionary<int, RaycastHit2D>();
 
     // Map.
     private readonly int mapWidth = 32;
@@ -79,7 +84,7 @@ public class Game : MonoBehaviour
     private List<BoxCollider2D> mapColliders = new List<BoxCollider2D>();
 
     // Player.
-    private readonly float playerSpeed = 5f;
+    private readonly float playerSpeed = 3f;
     private readonly float playerTurnSpeed = 90f;
     private readonly float playerStartX = 16f;
     private readonly float playerStartY = 8f;
@@ -132,16 +137,16 @@ public class Game : MonoBehaviour
     {
         for (int i = 0; i < screenWidth; i++)
         {
-            raycastDistances.Add(i, 0f);
+            raycastHits.Add(i, new RaycastHit2D());
 
             for (int j = 0; j < screenHeight; j++)
             {
-                var text = Instantiate(ScreenSymbolPrefab, ScreenCanvas.transform) as Text;
+                var symbol = Instantiate(ScreenSymbolPrefab, ScreenCanvas.transform) as Text;
 
-                var textRect = text.GetComponent<RectTransform>();
+                var textRect = symbol.GetComponent<RectTransform>();
                 textRect.anchoredPosition = new Vector2(i * screenOffset - (screenWidth * screenOffset / 2) + (screenOffset / 2), j * screenOffset - (screenHeight * screenOffset / 2) + (screenOffset / 2));
 
-                screenSymbols.Add(new Position(i, j), text);
+                screenSymbols.Add(new Position(i, j), symbol);
             }
         }
     }
@@ -201,7 +206,7 @@ public class Game : MonoBehaviour
 
             if (hit.collider != null)
             {
-                raycastDistances[i] = hit.distance;
+                raycastHits[i] = hit;
             }
         }
     }
@@ -210,19 +215,18 @@ public class Game : MonoBehaviour
     {
         for (int i = 0; i < screenWidth; i++)
         {
-            float distance = raycastDistances[i];
+            float distance = raycastHits[i].distance;
 
-            string symbol = string.Empty;
-            Color color = Color.clear;
+            float height = screenHeight - (distance * distanceMultiplier);
+            int verticalOffset = Mathf.RoundToInt((screenHeight - height) / 2f);
 
-            int height = Mathf.RoundToInt(screenHeight - distance);
-            int verticalOffset = (screenHeight - height) / 2;
+            string symbol = screenBlock;
+            float depth = height / screenHeight;
+            var color = new Color(depth, depth, depth);
 
-            if (distance < raycastMaxDistance)
+            if (raycastHits[i].normal.x >= 1f || raycastHits[i].normal.x <= -1f)
             {
-                symbol = "#";
-                float depth = height / (float)screenHeight;
-                color = new Color(depth, depth, depth);
+                color = new Color(depth * 0.75f, depth * 0.75f, depth * 0.75f);
             }
 
             for (int j = 0; j < screenHeight; j++)
@@ -231,18 +235,45 @@ public class Game : MonoBehaviour
 
                 if (j < verticalOffset)
                 {
-                    screenSymbol.text = string.Empty;
-                    screenSymbol.color = Color.clear;
+                    float floorColor = (verticalOffset - j) / (float)verticalOffset;
+
+                    screenSymbol.text = symbol;
+                    screenSymbol.color = new Color(floorColor * 0.4f, floorColor * 0.4f, floorColor * 0.4f);
+
+                    if (!screenSymbol.enabled)
+                    {
+                        screenSymbol.enabled = true;
+                    }
                 }
                 else if (j > screenHeight - verticalOffset)
                 {
-                    screenSymbol.text = string.Empty;
-                    screenSymbol.color = Color.clear;
+                    if (screenSymbol.enabled)
+                    {
+                        screenSymbol.enabled = false;
+                    }
                 }
                 else
                 {
+                    if (j == screenHeight - verticalOffset)
+                    {
+                        symbol = screenBlockTop;
+                    }
+                    else if (j == verticalOffset)
+                    {
+                        symbol = screenBlockBottom;
+                    }
+                    else
+                    {
+                        symbol = screenBlock;
+                    }
+
                     screenSymbol.text = symbol;
                     screenSymbol.color = color;
+
+                    if (!screenSymbol.enabled)
+                    {
+                        screenSymbol.enabled = true;
+                    }
                 }
             }
         }
