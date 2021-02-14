@@ -2,25 +2,13 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public struct Position
-{
-    public int X { get; }
-    public int Y { get; }
-
-    public Position(int x, int y)
-    {
-        X = x;
-        Y = y;
-    }
-}
-
 public class Game : MonoBehaviour
 {
     // References.
-    public Canvas ScreenCanvas;
-    public Text ScreenSymbolPrefab;
-    public BoxCollider2D MapColliderPrefab;
-    public Transform PlayerPrefab;
+    [SerializeField] private Canvas screenCanvas;
+    [SerializeField] private Text screenSymbolPrefab;
+    [SerializeField] private BoxCollider2D mapColliderPrefab;
+    [SerializeField] private Transform playerPrefab;
 
     // Screen.
     private readonly int screenWidth = 64;
@@ -81,6 +69,9 @@ public class Game : MonoBehaviour
         "################################",
     };
 
+    private readonly string mapFloorSymbol = ".";
+    private readonly string mapWallSymbol = "#";
+
     private List<BoxCollider2D> mapColliders = new List<BoxCollider2D>();
 
     // Player.
@@ -108,7 +99,7 @@ public class Game : MonoBehaviour
 
     private void GeneratePlayer()
     {
-        playerTransform = Instantiate(PlayerPrefab, new Vector2(playerStartX - 0.5f, playerStartY - 0.5f), Quaternion.identity, transform);
+        playerTransform = Instantiate(playerPrefab, new Vector2(playerStartX - 0.5f, playerStartY - 0.5f), Quaternion.identity, transform);
     }
 
     private void GenerateMapColliders()
@@ -119,13 +110,13 @@ public class Game : MonoBehaviour
             {
                 string symbol = map[j][i].ToString();
 
-                if (symbol == ".")
+                if (symbol == mapFloorSymbol)
                 {
                     continue;
                 }
-                else if (symbol == "#")
+                else if (symbol == mapWallSymbol)
                 {
-                    var boxCollider = Instantiate(MapColliderPrefab, new Vector2(i, j), Quaternion.identity, transform) as BoxCollider2D;
+                    var boxCollider = Instantiate(mapColliderPrefab, new Vector2(i, j), Quaternion.identity, transform) as BoxCollider2D;
 
                     mapColliders.Add(boxCollider);
                 }
@@ -141,7 +132,7 @@ public class Game : MonoBehaviour
 
             for (int j = 0; j < screenHeight; j++)
             {
-                var symbol = Instantiate(ScreenSymbolPrefab, ScreenCanvas.transform) as Text;
+                var symbol = Instantiate(screenSymbolPrefab, screenCanvas.transform) as Text;
 
                 var textRect = symbol.GetComponent<RectTransform>();
                 textRect.anchoredPosition = new Vector2(i * screenOffset - (screenWidth * screenOffset / 2) + (screenOffset / 2), j * screenOffset - (screenHeight * screenOffset / 2) + (screenOffset / 2));
