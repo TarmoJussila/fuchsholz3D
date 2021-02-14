@@ -12,6 +12,4 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Other license information
 ---
 
-Excluded from this licensing are font files which are distributed under
-the license of the respective copyright holder(s). These licenses, if they
-exist, are included in the font file directory along with the font files.
+Excluded from this licensing are font files which are distributed under the license of the respective copyright holder(s). These licenses, if they exist, are included in the font file directory along with the font files.
