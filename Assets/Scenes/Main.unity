@@ -233,6 +233,7 @@ MonoBehaviour:
     type: 3}
   playerPrefab: {fileID: 992404853058201431, guid: 64e2e938838c6b64db32bcadbd91ae68,
     type: 3}
+  mapTextAsset: {fileID: 4900000, guid: e520a82104478f245a97c4cbac9f0008, type: 3}
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0

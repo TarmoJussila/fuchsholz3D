@@ -4,11 +4,16 @@ using UnityEngine.UI;
 
 public class Game : MonoBehaviour
 {
-    // References.
+    [Header("Scene References")]
     [SerializeField] private Canvas screenCanvas;
+
+    [Header("Prefab References")]
     [SerializeField] private Text screenSymbolPrefab;
     [SerializeField] private BoxCollider2D mapColliderPrefab;
     [SerializeField] private Transform playerPrefab;
+
+    [Header("Map References")]
+    [SerializeField] private TextAsset mapTextAsset;
 
     // Screen.
     private readonly int screenWidth = 64;
@@ -20,59 +25,16 @@ public class Game : MonoBehaviour
     private readonly string screenEmpty = string.Empty;
     private readonly float distanceMultiplier = 1.3f;
 
-    private Dictionary<Position, Text> screenSymbols = new Dictionary<Position, Text>();
-
     // Raycast.
     private readonly float raycastMaxDistance = 30f;
     private readonly float raycastSpread = 0.2f;
     private readonly float raycastLength = 10f;
 
-    private Dictionary<int, RaycastHit2D> raycastHits = new Dictionary<int, RaycastHit2D>();
-
     // Map.
     private readonly int mapWidth = 32;
     private readonly int mapHeight = 32;
-
-    private readonly List<string> map = new List<string>()
-    {
-        "################################",
-        "#..............................#",
-        "#..............................#",
-        "#..............................#",
-        "#..............................#",
-        "#..............................#",
-        "#..............................#",
-        "#......##..............##......#",
-        "#......##..............##......#",
-        "#..............................#",
-        "#..............................#",
-        "#..............................#",
-        "#..............................#",
-        "#..............................#",
-        "#..............................#",
-        "##############....##############",
-        "##############....##############",
-        "#..............................#",
-        "#..............................#",
-        "#..............................#",
-        "#..............................#",
-        "#..............................#",
-        "#..............................#",
-        "#..............................#",
-        "#.............####.............#",
-        "#.............####.............#",
-        "#..............................#",
-        "#..............................#",
-        "#..............................#",
-        "#..............................#",
-        "#..............................#",
-        "################################",
-    };
-
     private readonly string mapFloorSymbol = ".";
     private readonly string mapWallSymbol = "#";
-
-    private List<BoxCollider2D> mapColliders = new List<BoxCollider2D>();
 
     // Player.
     private readonly float playerSpeed = 3f;
@@ -80,8 +42,12 @@ public class Game : MonoBehaviour
     private readonly float playerStartX = 16f;
     private readonly float playerStartY = 8f;
 
-    private float playerAngle = 0f;
+    // Runtime.
+    private Dictionary<Position, Text> screenSymbols = new Dictionary<Position, Text>();
+    private Dictionary<int, RaycastHit2D> raycastHits = new Dictionary<int, RaycastHit2D>();
+    private List<BoxCollider2D> mapColliders = new List<BoxCollider2D>();
     private Transform playerTransform;
+    private float playerAngle = 0f;
 
     private void Start()
     {
@@ -104,6 +70,8 @@ public class Game : MonoBehaviour
 
     private void GenerateMapColliders()
     {
+        var map = MapTextAssetToList(mapTextAsset);
+
         for (int i = 0; i < mapWidth; i++)
         {
             for (int j = 0; j < mapHeight; j++)
@@ -284,6 +252,17 @@ public class Game : MonoBehaviour
         }
 
         return distance;
+    }
+
+    private List<string> MapTextAssetToList(TextAsset mapTextAsset)
+    {
+        var list = new List<string>();
+        var lineArray = mapTextAsset.text.Split('\n');
+        foreach (var line in lineArray)
+        {
+            list.Add(line);
+        }
+        return list;
     }
 
     private void OnDrawGizmos()
